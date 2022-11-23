@@ -1,22 +1,49 @@
-async function listeProduit() {
-    const catalogue = await fetch("https://jsonplaceholder.typicode.com/users")
-    if (catalogue.ok === true) {
-        return catalogue.json();
-    }
-    throw new error('Impossible de contacter le serveur')
 
+//     /*
+//     document.createELement() + innerHtml
+//     document.createDocumentFragement()
+//     .appendchild()
+
+//     */
+// }
+
+
+
+// async function fetchProduct() {
+//     const fetchProductReply = await fetch("http://localhost:3000/api/products")
+//     if (fetchProductReply.ok) {
+//         return fetchProductReply.json()
+//     } else {
+//         console.log(fetchProductReply.error)
+//     }
+// }
+
+// async function displayProduct() {
+//     const products = await fetchProduct();
+//     console.log(products);
+// }
+
+// displayProduct()
+
+
+
+//function qui appel l'API - sans lien
+async function fetchrequest(request) {
+    const fetchtReply = await fetch(request)
+    if (fetchtReply.ok) {
+        return fetchtReply.json()
+    } else {
+        console.log(fetchtReply.error)
+    }
 }
 
 
-// fetch("http://localhost:3000/api/products")
-//     .then(function (res) {
-//         if (res.ok) {
-//             return res.json();
-//         }
-//     })
-//     .then(function (value) {
-//         console.log(value);
-//     })
-//     .catch(function (err) {
-//         // Une erreur est survenue
-//     });
+
+
+//fonction qui nomme l'API et personnalise le lien
+async function displayProduct() {
+    const products = await fetchrequest("http://localhost:3000/api/products");
+    let product0 = document.querySelector(`#product0 article img`)
+    product0.src = products[0].imageUrl
+}
+displayProduct()
