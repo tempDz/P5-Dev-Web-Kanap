@@ -27,7 +27,7 @@
 
 
 
-//function qui appel l'API - sans lien
+//function standard qui appel l'API
 async function fetchrequest(request) {
     const fetchtReply = await fetch(request)
     if (fetchtReply.ok) {
@@ -38,12 +38,36 @@ async function fetchrequest(request) {
 }
 
 
-
-
 //fonction qui nomme l'API et personnalise le lien
 async function displayProduct() {
-    const products = await fetchrequest("http://localhost:3000/api/products");
-    let product0 = document.querySelector(`#product0 article img`)
-    product0.src = products[0].imageUrl
+    const request = await fetchrequest("http://localhost:3000/api/products");
+
+    const img = document.querySelector("a article img")
+
+    for (let i = 7; i >= 0; i--) {
+
+        const items = document.querySelector(".items")
+        const a = document.createElement("a")
+        const article = document.createElement("article")
+        const img = document.createElement("img")
+        const h3 = document.createElement("h3")
+        const p = document.createElement("p")
+
+        items.insertAdjacentElement("afterbegin", a)
+        a.insertAdjacentElement("afterbegin", article)
+        article.insertAdjacentElement("afterbegin", img)
+        article.insertAdjacentElement("beforeend", h3)
+        article.insertAdjacentElement("beforeend", p)
+
+        a.setAttribute("id", request[i]._id)
+        a.setAttribute("href", "./product.html?id=" + request[i]._id)
+        img.setAttribute("src", request[i].imageUrl)
+        img.setAttribute("alt", request[i].altTxt)
+        h3.innerText = request[i].name
+        p.innerText = request[i].description
+    }
+    console.log(Array(request).length);
+    console.log(map[request])
 }
 displayProduct()
+

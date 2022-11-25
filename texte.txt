@@ -1,0 +1,9 @@
+        <a id="product0" href="./product.html?id=42">
+          <article>
+            <img src=".../product01.jpg" alt="Lorem ipsum dolor sit amet, Kanap name1">
+            <h3 class="productName">Kanap name1</h3>
+            <p class="productDescription">Dis enim malesuada.</p>
+          </article>
+        </a>
+
+http://localhost:3000/api/products/product.html?id=107fb5b75607497b96722bda5b504926
