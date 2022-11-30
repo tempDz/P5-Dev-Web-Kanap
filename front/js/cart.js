@@ -3,10 +3,17 @@
 //déclaration de la variable avec comme valeur la mémoire de Local Storage
 let registeredPurchaseLocalStorage = JSON.parse(localStorage.getItem("purchaseInMemory"));
 let registeredPurchaseLocalStorageChart = registeredPurchaseLocalStorage[0]
-console.log(registeredPurchaseLocalStorageChart)
-const cart__items = document.getElementById("cart__items")
-cart__items.innerHTML =
-    `<article class="cart__item" data-id="${registeredPurchaseLocalStorageChart[0]}" data-color="${registeredPurchaseLocalStorageChart[1]}">
+
+const cart__items = document.getElementById("cart__items")//récupération de la balise html servant à l'insertion de l'achat
+
+const purchaseInsertion = function () {
+    let fragment = document.createDocumentFragment();//création d'un fragement de code HTML invisible
+    let article = document.createElement("article")//création de la balise article
+    article.setAttribute("class", "cart__item")
+    article.setAttribute("data-id", `${registeredPurchaseLocalStorageChart[0]}`)
+    article.setAttribute("data-color", `${registeredPurchaseLocalStorageChart[1]}`)
+    // `<article class="cart__item" data-id="${registeredPurchaseLocalStorageChart[0]}" data-color="${registeredPurchaseLocalStorageChart[1]}">
+    article.innerHTML = `
 <div class="cart__item__img">
   <img src="${registeredPurchaseLocalStorageChart[2]}" alt="${registeredPurchaseLocalStorageChart[3]}">
 </div>
@@ -26,4 +33,9 @@ cart__items.innerHTML =
     </div>
   </div>
 </div>
-</article>`
+</article>`;
+    // fragment.appendChild(a)
+    cart__items.appendChild(article)
+}
+
+purchaseInsertion()
