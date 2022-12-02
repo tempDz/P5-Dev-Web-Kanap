@@ -21,12 +21,12 @@ const colors = document.getElementById("colors");
 const kanapName = document.querySelector("#title");
 const price = document.querySelector("#price");
 const item__img = document.querySelector(".item__img");
+const description = document.querySelector("#description");
 const img = document.createElement("img");//création de la balise image
 //fonction qui nomme l'API et personnalise le lien
 async function displayProduct() {
     const listId = await fetchrequest(recupId);
     //selection de la balise via son ID ou sa CLASS    
-    const description = document.querySelector("#description");
     kanapName.innerText = listId.name;
     item__img.insertAdjacentElement("afterbegin", img);//insertion de la balise img
     img.setAttribute("src", listId.imageUrl);//dans la balise img, rajout de l'attribut src pour valeur url de l'image
@@ -47,43 +47,55 @@ async function displayProduct() {
 displayProduct();
 
 //---------------récupération des informations du produit en préparation du panier--------------------------------
-let selectedColors = "";
-colors.addEventListener("change", function () {
-    selectedColors = colors.value;
+let selectedColors = "";//déclaration de la varible du choix de la couleur
+colors.addEventListener("change", function () {//nous écoutons le boutton choix couleur
+    selectedColors = colors.value;//en cas de changement nour engistrons la valeur selectionnée dans la variable
 });
 
-const quantity = document.querySelector(".item__content__settings__quantity input");
-let selectedQuantity = 0;
-quantity.addEventListener("change", function () {
-    selectedQuantity = quantity.value;
+const quantity = document.querySelector(".item__content__settings__quantity input");//nous selectionnons la balise HTML
+let selectedQuantity = 0;//déclaration de la varible quantité
+quantity.addEventListener("change", function () {//nous écoutons le boutton quantité
+    selectedQuantity = quantity.value;//en cas de changement nour engistrons la valeur selectionnée dans la variable
 });
 
-//déclaration de la varible Array purchaseOption qui contiendra les options d'achat
-let purchaseOption = {};
-//nous sélectionnons le bouton Ajouter panier afin de l'écouter
+//nous sélectionnons le bouton Ajouter Panier afin de l'écouter
 const addCartButton = document.querySelector("#addToCart");
+
 //---------------LOCAL STORAGE--------------------------------
-//déclaration de la variable avec comme valeur la mémoire de Local Storage
+//déclaration de la variable avec comme valeur la mémoire de Local Storage converti en objet JavaScript
 let registeredPurchaseLocalStorage = JSON.parse(localStorage.getItem("purchaseInMemory"));
 
-//au clic du bouton Ajouter panier nous enregistrons les selections
+//au clic du bouton Ajouter panier nous enregistrons les options d'achat
 addCartButton.addEventListener("click", function () {
+    //déclaration de la varible Array purchaseOption qui contiendra les options d'achat
+    let purchaseOption = {}
+    purchaseOption = {
+        idCart: recupId,
+        colorCart: selectedColors,
+        imgSrcCart: img.getAttribute("src"),
+        imgAltCart: img.getAttribute("alt"),
+        kanapNameCart: kanapName.innerText,
+        descriptionCart: description.innerText,
+        quantityCart: selectedQuantity,
+        totalPriceCart: price.innerText * selectedQuantity
+    };
+
     if (selectedQuantity < 1) {//si la quantité est inférieur à 1 Alerte
         alert("Veuillez choisir une quantité surpérieur à 0");
     } else {
-        purchaseOption = [
-            recupId,
-            selectedColors,
-            img.getAttribute("src"),
-            img.getAttribute("alt"),
-            kanapName.innerText,
-            selectedQuantity,
-            price.innerText * selectedQuantity];
-        //on vide le Local Storage
-        registeredPurchaseLocalStorage = [];
-        //On rajoute une option d'achat dans le Local Storage
-        registeredPurchaseLocalStorage.push(purchaseOption);
-        //on transforme en JSON pour qu'il soit compris par le navigateur
-        localStorage.setItem("purchaseInMemory", JSON.stringify(registeredPurchaseLocalStorage));
+        if (registeredPurchaseLocalStorage) {//verifie si un panier existe deja dans le Local Storage
+            //On rajoute les options d'achats dans le Local Storage
+            registeredPurchaseLocalStorage.push(purchaseOption);
+            //on transforme en JSON pour qu'il soit compris par le navigateur
+            localStorage.setItem("purchaseInMemory", JSON.stringify(registeredPurchaseLocalStorage));
+        }
+        else {
+            //création array vide si Local Storage vide
+            registeredPurchaseLocalStorage = [];
+            //On rajoute les options d'achats dans le Local Storage
+            registeredPurchaseLocalStorage.push(purchaseOption);
+            //on transforme en JSON pour qu'il soit compris par le navigateur
+            localStorage.setItem("purchaseInMemory", JSON.stringify(registeredPurchaseLocalStorage));
+        }
     }
 })
