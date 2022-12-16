@@ -27,7 +27,9 @@ async function displayProduct() {
         fragment.appendChild(a)
     });
     section.appendChild(fragment)
+    console.log(products)
 }
 
 displayProduct()
+
 

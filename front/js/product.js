@@ -63,39 +63,50 @@ const addCartButton = document.querySelector("#addToCart");
 
 //---------------LOCAL STORAGE--------------------------------
 //déclaration de la variable avec comme valeur la mémoire de Local Storage converti en objet JavaScript
-let registeredPurchaseLocalStorage = JSON.parse(localStorage.getItem("purchaseInMemory"));
-
+let selectedProducts = JSON.parse(localStorage.getItem("purchaseInMemory"));
 //au clic du bouton Ajouter panier nous enregistrons les options d'achat
 addCartButton.addEventListener("click", function () {
     //déclaration de la varible Array purchaseOption qui contiendra les options d'achat
-    let purchaseOption = {}
-    purchaseOption = {
-        idCart: recupId,
-        colorCart: selectedColors,
-        imgSrcCart: img.getAttribute("src"),
-        imgAltCart: img.getAttribute("alt"),
-        kanapNameCart: kanapName.innerText,
-        descriptionCart: description.innerText,
-        quantityCart: selectedQuantity,
-        totalPriceCart: price.innerText * selectedQuantity
+    let purchaseOption = {
+        id: recupId,
+        color: selectedColors,
+        quantity: selectedQuantity,
     };
-
-    if (selectedQuantity < 1) {//si la quantité est inférieur à 1 Alerte
-        alert("Veuillez choisir une quantité surpérieur à 0");
-    } else {
-        if (registeredPurchaseLocalStorage) {//verifie si un panier existe deja dans le Local Storage
-            //On rajoute les options d'achats dans le Local Storage
-            registeredPurchaseLocalStorage.push(purchaseOption);
+    if (selectedColors === "") {
+        alert("Veuillez choisir une couleur");
+    }
+    else if (selectedQuantity < 1 || selectedQuantity > 100) {//si la quantité est inférieur à 1 Alerte
+        alert("Veuillez choisir une quantité surpérieur à 0 et maximum 100");
+    }
+    else {
+        let test = false
+        if (selectedProducts &&
+            test === false) {//verifie si un panier existe deja dans le Local Storage            
+            selectedProducts.forEach(product => {
+                if (product.id === recupId &&
+                    product.color === selectedColors) {
+                    if (parseInt(product.quantity) + parseInt(selectedQuantity) > 100) {
+                        alert("Vous avez atteint la limite de 100, pour ce produit");
+                        test = true
+                    } else {
+                        product.quantity = parseInt(product.quantity) + parseInt(selectedQuantity)
+                        test = true
+                    }
+                }
+            })
+            if (selectedProducts && test === false)
+                //On rajoute les options d'achats dans le Local Storage
+                selectedProducts.push(purchaseOption);
             //on transforme en JSON pour qu'il soit compris par le navigateur
-            localStorage.setItem("purchaseInMemory", JSON.stringify(registeredPurchaseLocalStorage));
+            localStorage.setItem("purchaseInMemory", JSON.stringify(selectedProducts));
         }
         else {
             //création array vide si Local Storage vide
-            registeredPurchaseLocalStorage = [];
+            selectedProducts = [];
             //On rajoute les options d'achats dans le Local Storage
-            registeredPurchaseLocalStorage.push(purchaseOption);
+            selectedProducts.push(purchaseOption);
             //on transforme en JSON pour qu'il soit compris par le navigateur
-            localStorage.setItem("purchaseInMemory", JSON.stringify(registeredPurchaseLocalStorage));
+            localStorage.setItem("purchaseInMemory", JSON.stringify(selectedProducts));
         }
     }
 })
