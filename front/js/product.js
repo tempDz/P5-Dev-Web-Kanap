@@ -86,7 +86,8 @@ addCartButton.addEventListener("click", function () {
                 if (product.id === recupId &&
                     product.color === selectedColors) {
                     if (parseInt(product.quantity) + parseInt(selectedQuantity) > 100) {
-                        alert("Vous avez atteint la limite de 100, pour ce produit");
+                        alert(`Vous avez atteint la limite max de 100 dans le panier, pour la configuration :\n${document.getElementById("title").innerText} de couleur ${purchaseOption.color} `);
+                        console.log(document.getElementById("title").innerText)
                         test = true
                     } else {
                         product.quantity = parseInt(product.quantity) + parseInt(selectedQuantity)
@@ -99,9 +100,16 @@ addCartButton.addEventListener("click", function () {
                 selectedProducts.push(purchaseOption);
             //on transforme en JSON pour qu'il soit compris par le navigateur
             localStorage.setItem("purchaseInMemory", JSON.stringify(selectedProducts));
+            const dialog = confirm(`Votre selection à bien été ajouté.\nSouhaitez-vous accèder à votre panier?`);
+            if (dialog) {
+                window.location.href = "http://127.0.0.1:5500/front/html/cart.html";
+            }
+            // else {
+            //     console.log('Data Not Saved')
+            // }
         }
         else {
-            //création array vide si Local Storage vide
+            //création array vide si Local Storage vide pour y stocker autant d'objet souhaité
             selectedProducts = [];
             //On rajoute les options d'achats dans le Local Storage
             selectedProducts.push(purchaseOption);
