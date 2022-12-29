@@ -66,7 +66,7 @@ async function purchaseInsertion() {
   document.querySelectorAll(".deleteItem").forEach(deleteItemButton => {
     const article = deleteItemButton.closest("article");
     //nous écoutons le bouton
-    deleteItemButton.addEventListener('click', function (event) {
+    deleteItemButton.addEventListener('click', function () {
       //on boucle sur l'ensemble des produits enregistrés dans le LS
       selectedProducts.forEach(product => {
         // quand le bouton supprimer correspond au produit dans le LS =>...
@@ -104,8 +104,8 @@ async function purchaseInsertion() {
       })
     })
   })
-
   updateTotal();
+
 }
 purchaseInsertion()
 
@@ -117,7 +117,7 @@ function updateTotal() {
   let totalQte = document.querySelector("#totalQuantity")
   const allPrices = document.querySelectorAll(".cart__item__content__description :nth-child(3)");
   for (const price of allPrices) {
-    baliseQte = price.closest("article").querySelector(".itemQuantity");
+    let baliseQte = price.closest("article").querySelector(".itemQuantity");
     totalQteProduct += parseInt(baliseQte.value);
     totalPriceProduct += parseInt(price.textContent) * parseInt(baliseQte.value);
   }
@@ -126,42 +126,56 @@ function updateTotal() {
 }
 
 //***********************FORMULAIRE CONTACT********************************************
+//fonction trouvée sur web afin de controler conformité email
 function ValidateEmail(inputText) {
   const mailformat = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
   if (inputText.value.match(mailformat)) {
     return true;
   }
   else {
-    alert("Vous avez saisi une adresse mail invalide !");    //The pop up alert for an invalid email address
+    alert("Vous avez saisi une adresse mail invalide !");    //The pop up alert for an invalid email address
     document.getElementById("email").focus();
     return false;
   }
 }
+//récupération des info du formulaire dans un objet
+let formulaire = {
+  firstName: document.getElementById("firstName").value,
+  lastName: document.getElementById("lastName").value,
+  address: document.getElementById("address").value,
+  city: document.getElementById("city").value,
+  email: document.getElementById("email").value,
+}
+
+/*fonction qui détecte si un chiffre est présent dans
+les formulaires nom, prénom ville*/
+function containsNumbers(str, balise) {
+  if (/\d/.test(str)) {
+    // console.log(document.querySelector(str).textContent)
+    return document.querySelector(`#${balise}ErrorMsg`).textContent = "erreur"
+  };
+}
+/*boucle sur les formulaires et controle uniquement
+les saisies nom, prénom et ville*/
+for (const property in formulaire) {
+  if (property === "firstName" ||
+    property === "lastName" ||
+    property === "city") {
+    document.querySelector(`#${property}`).addEventListener("input", function () {
+      containsNumbers(document.getElementById(property).value, property)
+      // document.querySelector(`#${property}ErrorMsg`).textContent = "erreur"
+    })
+  }
+}
 
 let order = document.getElementById("order")
-// let cartValidation = JSON.parse(localStorage.getItem("cartValidation"));
-
 order.addEventListener("click", (event) => {
-  event.preventDefault();
-  let formulaire = {
-    firstName: document.getElementById("firstName").value,
-    lastName: document.getElementById("lastName").value,
-    address: document.getElementById("address").value,
-    city: document.getElementById("city").value,
-    email: document.getElementById("email").value,
-  }
-  let test = false
-  for (const [key, value] of Object.entries(formulaire)) {
-    if (!value && test === false) {
-      alert("Veuillez remplir tous les champs")
-      document.getElementById(`${key}`).focus();
-      test = true
-    }
-  }
-  if (test === false) {
-    ValidateEmail(email)
-    localStorage.setItem("cartValidation", JSON.stringify(formulaire));
-  }
+  // console.log(document.querySelector("#firstName").closest(".cart__order__form__question #firstNameErrorMsg").innerHTML);
+  // itemQuantity.closest(".cart__item").getAttribute("data-color")
+
+  // ValidateEmail(email)
+  // localStorage.setItem("cartValidation", JSON.stringify(formulaire));
+
 })
 //*******************************************BOUTON COMMANDER**********************************
 let buttonOrder = document.getElementById("order")
