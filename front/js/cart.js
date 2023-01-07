@@ -22,17 +22,16 @@ async function purchaseInsertion() {
   //création d'un fragement de code HTML invisible
   let fragment = document.createDocumentFragment();
   //boucle, pour chaque produit trouvé dans liste produits du LS
-  for (product of selectedProducts) {
+  for (const product of selectedProducts) {
     /*variable qui récupère les informations dans l'API
     grace à l'ID du produit dans le LS*/
     productApi = await fetchrequest(product.id);
     //création de la balise article et ses attributs
     //product = info dans LS - productApi = info dans API
     let article = document.createElement("article")
-    article.setAttribute("class", "cart__item")
+    article.className = "cart__item";
     article.dataset.id = product.id;
-    article.setAttribute("data-id", `${product.id}`)
-    article.setAttribute("data-color", `${product.color}`)
+    article.dataset.color = product.color;
     //alimentation de la balise article par du texte HTML + variable
     article.innerHTML =
       `<div class="cart__item__img">
@@ -177,12 +176,13 @@ document.querySelector("#email").addEventListener("input", function () {
 })
 //*******************************************BOUTON COMMANDER**********************************
 
-let order = document.getElementById("order")
-let products = [];
-
 // function standard qui appel l'API
-async function fetchrequestOrder(api) {
-  const fetchtReply = await api
+async function orderBasket(form) {
+  const fetchtReply = await fetch("http://localhost:3000/api/products/order", {
+    method: "POST",
+    body: JSON.stringify(form),
+    headers: { "Content-Type": "application/json" },
+  })
   if (fetchtReply.ok) {
     return fetchtReply.json()
     // console.log(fetchtReply.json())
@@ -191,7 +191,10 @@ async function fetchrequestOrder(api) {
   }
 }
 
-order.addEventListener("click", (event) => {
+let submitButton = document.getElementById("order")
+let products = [];
+
+order.addEventListener("click", async (event) => {
   event.preventDefault()
   selectedProducts.forEach(product => {
     products.push(product.id)
@@ -207,16 +210,9 @@ order.addEventListener("click", (event) => {
     },
     products: products
   }
-  const sendCommandPromise = fetch("http://localhost:3000/api/products/order", {
-    method: "POST",
-    body: JSON.stringify(sendCommand),
-    headers: { "Content-Type": "application/json" },
-  })
 
-  async function displayProduct() {
-    const products = await fetchrequestOrder(sendCommandPromise);
-    console.log(products.orderId)
-    document.location.href = 'confirmation.html?id=' + products.orderId;
-  }
-  displayProduct()
+  const order = await orderBasket(sendCommand);
+  document.location.href = 'confirmation.html?id=' + order.orderId;
 })
+
+

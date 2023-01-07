@@ -1,12 +1,12 @@
 
-const recupUrl = window.location.search;//récupération de la chaine de requete de l'URL
+const idUrlSearchParams = new URLSearchParams(window.location.search);/** MAP de : ?id=107fb5b75607497b96722bda5b504926*/
+const recupId = idUrlSearchParams.get("id");
 
-
-const idUrlSearchParams = new URLSearchParams(recupUrl);//recuperer l'URL
-const recupId = idUrlSearchParams.get("id");//extraire l'ID
-
-//affichage du produit correspondant al'ID
-//function standard qui appel l'API
+/**
+ * 
+ * @param {string} lien de l'API
+ * @returns {Objet} fichier au format JSON, non lisible en JS
+ */
 async function fetchrequest(id) {
     const fetchtReply = await fetch("http://localhost:3000/api/products/" + id);
     if (fetchtReply.ok) {
@@ -23,7 +23,7 @@ const price = document.querySelector("#price");
 const item__img = document.querySelector(".item__img");
 const description = document.querySelector("#description");
 const img = document.createElement("img");//création de la balise image
-//fonction qui nomme l'API et personnalise le lien
+
 async function displayProduct() {
     const listId = await fetchrequest(recupId);
     //selection de la balise via son ID ou sa CLASS    
@@ -46,7 +46,7 @@ async function displayProduct() {
 
 displayProduct();
 
-//---------------récupération des informations du produit en préparation du panier--------------------------------
+//---------------récupération des informations du produit en préparation du panier-----
 let selectedColors = "";//déclaration de la varible du choix de la couleur
 colors.addEventListener("change", function () {//nous écoutons le boutton choix couleur
     selectedColors = colors.value;//en cas de changement nour engistrons la valeur selectionnée dans la variable
@@ -61,13 +61,14 @@ quantity.addEventListener("change", function () {//nous écoutons le boutton qua
 //nous sélectionnons le bouton Ajouter Panier afin de l'écouter
 const addCartButton = document.querySelector("#addToCart");
 
-//---------------LOCAL STORAGE--------------------------------
+//---------------LOCAL STORAGE----------
 //déclaration de la variable avec comme valeur la mémoire de Local Storage converti en objet JavaScript
 let selectedProducts = JSON.parse(localStorage.getItem("purchaseInMemory"));
+let purchaseOption = {}
 //au clic du bouton Ajouter panier nous enregistrons les options d'achat
 addCartButton.addEventListener("click", function () {
-    //déclaration de la varible Array purchaseOption qui contiendra les options d'achat
-    let purchaseOption = {
+    //création d'un objet purchaseOption qui contiendra les options d'achat
+    purchaseOption = {
         id: recupId,
         color: selectedColors,
         quantity: selectedQuantity,
@@ -80,41 +81,44 @@ addCartButton.addEventListener("click", function () {
     }
     else {
         let test = false
-        if (selectedProducts &&
-            test === false) {//verifie si un panier existe deja dans le Local Storage            
+        if (selectedProducts && test === false) { //verifie si un panier existe deja dans le LS         
             selectedProducts.forEach(product => {
+                //verifie s'il existe déjà une configuration identique dans le LS
                 if (product.id === recupId &&
                     product.color === selectedColors) {
+                    //si VRAI verifie que la quantité totale ne depasse pas 100
                     if (parseInt(product.quantity) + parseInt(selectedQuantity) > 100) {
                         alert(`Vous avez atteint la limite max de 100 dans le panier, pour la configuration :\n${document.getElementById("title").innerText} de couleur ${purchaseOption.color} `);
                         console.log(document.getElementById("title").innerText)
                         test = true
                     } else {
+                        //si quantité <= 100 incremente la quantité choisie dans le LS
                         product.quantity = parseInt(product.quantity) + parseInt(selectedQuantity)
                         test = true
+                        addItem();
                     }
                 }
             })
-            if (selectedProducts && test === false)
-                //On rajoute les options d'achats dans le Local Storage
+            if (selectedProducts && test === false) {
+                // On rajoute les options d'achats dans le LS
                 selectedProducts.push(purchaseOption);
-            //on transforme en JSON pour qu'il soit compris par le navigateur
-            localStorage.setItem("purchaseInMemory", JSON.stringify(selectedProducts));
-            const dialog = confirm(`Votre selection à bien été ajouté.\nSouhaitez-vous accèder à votre panier?`);
-            if (dialog) {
-                window.location.href = "http://127.0.0.1:5500/front/html/cart.html";
+                addItem();
             }
-            // else {
-            //     console.log('Data Not Saved')
-            // }
         }
         else {
             //création array vide si Local Storage vide pour y stocker autant d'objet souhaité
             selectedProducts = [];
-            //On rajoute les options d'achats dans le Local Storage
+            // On rajoute les options d'achats dans le LS
             selectedProducts.push(purchaseOption);
-            //on transforme en JSON pour qu'il soit compris par le navigateur
-            localStorage.setItem("purchaseInMemory", JSON.stringify(selectedProducts));
+            addItem();
         }
     }
 })
+function addItem() {
+    //on transforme en JSON
+    localStorage.setItem("purchaseInMemory", JSON.stringify(selectedProducts));
+    const dialog = confirm(`Votre selection à bien été ajouté.\nSouhaitez-vous accèder à votre panier?`);
+    if (dialog) {
+        window.location.href = "http://127.0.0.1:5500/front/html/cart.html";
+    }
+}
