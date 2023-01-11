@@ -132,19 +132,24 @@ function updateTotal() {
   totalQte.textContent = totalQteProduct;
 }
 
+let cartEmpty = false
+document.getElementById('totalQuantity').addEventListener('DOMSubtreeModified', function (event) {
+  // récupération de la nouvelle valeur du paragraphe
+  cartEmpty = false
+  const newValue = parseInt(event.target.textContent, 10);
+  if (newValue === 0) {
 
-function cartEmpty(event) {
-  const newValue = parseInt(document.getElementById('totalQuantity').textContent, 10);
-  if (newValue === 0 || newValue === "") {
-    const dialog = confirm(`Le panier est vide. Vous allez maintenant être redirigé vers la liste des produits.`);
-    if (dialog) {
-      window.location.href = "http://127.0.0.1:5500/front/html/index.html";
-      event.preventDefault
-    } else (
-      event.preventDefault
-    )
+    cartEmpty = true
+    console.log(newValue)
+    console.log(cartEmpty)
+  } else {
+    cartEmpty = false
+    console.log(newValue)
+    console.log(cartEmpty)
   }
-}
+});
+
+
 //***********************FORMULAIRE CONTACT********************************************
 //récupération des info du formulaire dans un objet
 let formulaire = {
@@ -211,11 +216,16 @@ async function orderBasket(form) {
 }
 
 order.addEventListener("click", async (event) => {
-  cartEmpty(event);
   for (const property in formulaire) {
     if (document.querySelector(`#${property}ErrorMsg`).innerText !== "" ||
       document.querySelector(`#${property}`).value === "") {
       ErrorMsg = true
+    }
+  }
+  if (cartEmpty === true) {
+    const dialog = confirm(`Le panier est vide. Vous allez maintenant être redirigé vers la liste des produits.`);
+    if (dialog) {
+      window.location.href = "http://127.0.0.1:5500/front/html/index.html";
     }
   }
 
